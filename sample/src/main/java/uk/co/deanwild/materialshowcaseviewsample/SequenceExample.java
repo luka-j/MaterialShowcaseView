@@ -76,18 +76,14 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
 
         sequence.addSequenceItem(
                 new MaterialShowcaseView.Builder(this)
-                        .setTarget(mButtonTwo)
-                        .setDismissText("GOT IT")
-                        .setContentText("This is button two")
+                        .addTarget(mButtonTwo)
                         .withRectangleShape(true)
                         .build()
         );
 
         sequence.addSequenceItem(
                 new MaterialShowcaseView.Builder(this)
-                        .setTarget(mButtonThree)
-                        .setDismissText("GOT IT")
-                        .setContentText("This is button three")
+                        .addTarget(mButtonThree)
                         .withRectangleShape()
                         .build()
         );

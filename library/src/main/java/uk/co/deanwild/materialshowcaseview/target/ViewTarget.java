@@ -5,10 +5,12 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.view.View;
 
+import uk.co.deanwild.materialshowcaseview.shape.Shape;
+
 
 public class ViewTarget implements Target {
-
     private final View mView;
+    private Shape mShape;
 
     public ViewTarget(View view) {
         mView = view;
@@ -37,5 +39,13 @@ public class ViewTarget implements Target {
                 location[0] + mView.getMeasuredWidth(),
                 location[1] + mView.getMeasuredHeight()
         );
+    }
+
+    public Shape getShape() {
+        return mShape;
+    }
+
+    public void setShape(Shape shape) {
+        this.mShape = shape;
     }
 }

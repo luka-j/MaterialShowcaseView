@@ -12,7 +12,7 @@ public class ShowcaseConfig {
     public static final long DEFAULT_FADE_TIME = 300;
     public static final long DEFAULT_DELAY = 0;
     public static final Shape DEFAULT_SHAPE = new CircleShape();
-    public static final int DEFAULT_SHAPE_PADDING = 10;
+    public static final int DEFAULT_SHAPE_PADDING = 0;
 
     private long mDelay = DEFAULT_DELAY;
     private int mMaskColour;
