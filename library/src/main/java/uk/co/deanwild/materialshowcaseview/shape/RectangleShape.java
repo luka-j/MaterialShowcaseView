@@ -4,16 +4,17 @@ package uk.co.deanwild.materialshowcaseview.shape;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 
 import uk.co.deanwild.materialshowcaseview.target.Target;
 
 public class RectangleShape implements Shape {
-
     private boolean fullWidth = false;
 
     private int width = 0;
     private int height = 0;
     private boolean adjustToTarget = true;
+    private int roundCorners = 0;
 
     private Rect rect;
 
@@ -51,13 +52,17 @@ public class RectangleShape implements Shape {
     @Override
     public void draw(Canvas canvas, Paint paint, int x, int y, int padding) {
         if (!rect.isEmpty()) {
-            canvas.drawRect(
+            RectF rectF = new RectF(
                     rect.left + x - padding,
                     rect.top + y - padding,
                     rect.right + x + padding,
-                    rect.bottom + y + padding,
-                    paint
+                    rect.bottom + y + padding
             );
+            if (roundCorners > 0) {
+                canvas.drawRoundRect(rectF, roundCorners, roundCorners, paint);
+            } else {
+                canvas.drawRect(rectF,paint);
+            }
         }
     }
 
@@ -81,5 +86,13 @@ public class RectangleShape implements Shape {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    public int getRoundCorners() {
+        return roundCorners;
+    }
+
+    public void setRoundCorners(int roundCornersInPx) {
+        this.roundCorners = roundCornersInPx;
     }
 }
