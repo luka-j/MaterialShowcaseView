@@ -257,7 +257,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
      * SETTERS
      */
 
-    private void setShapePadding(int padding) {
+    public void setShapePadding(int padding) {
         mShapePadding = padding;
     }
 
