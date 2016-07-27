@@ -63,7 +63,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     List<IShowcaseListener> mListeners; // external listeners who want to observe when we show and dismiss
     private UpdateOnGlobalLayout mLayoutListener;
     private IDetachedListener mDetachedListener;
-    private boolean mTargetTouchable = true;
+    private boolean mTargetTouchable = false;
     private boolean mDismissOnTargetTouch = true;
     private ShapeType mShapeType = ShapeType.RECTANGLE_SHAPE;
 
@@ -190,13 +190,12 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             hide();
         }
         for (Target target : mTargets) {
-            if (mTargetTouchable && target.getBounds().contains((int) event.getX(), (int) event.getY())) {
+            if (target.getBounds().contains((int) event.getX(), (int) event.getY())) {
                 if (mDismissOnTargetTouch) {
                     hide();
                 }
-                return false;
+                return !mTargetTouchable;
             }
-
         }
         return true;
     }
