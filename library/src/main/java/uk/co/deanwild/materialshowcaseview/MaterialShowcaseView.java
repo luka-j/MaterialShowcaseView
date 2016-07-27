@@ -63,7 +63,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     List<IShowcaseListener> mListeners; // external listeners who want to observe when we show and dismiss
     private UpdateOnGlobalLayout mLayoutListener;
     private IDetachedListener mDetachedListener;
-    private boolean mTargetTouchable = false;
+    private boolean mTargetTouchable = true;
     private boolean mDismissOnTargetTouch = true;
     private ShapeType mShapeType = ShapeType.RECTANGLE_SHAPE;
 
@@ -261,31 +261,31 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         mShapePadding = padding;
     }
 
-    private void setDismissOnTouch(boolean dismissOnTouch) {
+    public void setDismissOnTouch(boolean dismissOnTouch) {
         mDismissOnTouch = dismissOnTouch;
     }
 
-    private void setShouldRender(boolean shouldRender) {
+    public void setShouldRender(boolean shouldRender) {
         mShouldRender = shouldRender;
     }
 
-    protected void setMaskColour(int maskColour) {
+    public void setMaskColour(int maskColour) {
         mMaskColour = maskColour;
     }
 
-    private void setDelay(long delayInMillis) {
+    public void setDelay(long delayInMillis) {
         mDelayInMillis = delayInMillis;
     }
 
-    private void setFadeDuration(long fadeDurationInMillis) {
+    public void setFadeDuration(long fadeDurationInMillis) {
         mFadeDurationInMillis = fadeDurationInMillis;
     }
 
-    private void setTargetTouchable(boolean targetTouchable) {
+    public void setTargetTouchable(boolean targetTouchable) {
         mTargetTouchable = targetTouchable;
     }
 
-    private void setDismissOnTargetTouch(boolean dismissOnTargetTouch) {
+    public void setDismissOnTargetTouch(boolean dismissOnTargetTouch) {
         mDismissOnTargetTouch = dismissOnTargetTouch;
     }
 
