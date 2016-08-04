@@ -79,10 +79,13 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         this(context, attrs, 0, DEFAULT_CONTENT_LAYOUT_ID);
     }
 
-    public MaterialShowcaseView(Context context, AttributeSet attrs, int defStyleAttr, int contentResId) {
+    public MaterialShowcaseView(Context context, AttributeSet attrs, int defStyleAttr, Integer contentResId) {
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);
 
+        if (contentResId == null) {
+            contentResId = DEFAULT_CONTENT_LAYOUT_ID;
+        }
         // create our animation factory
         mAnimationFactory = new AnimationFactory();
 
@@ -194,6 +197,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
                 if (mDismissOnTargetTouch) {
                     hide();
                 }
+                onTargetTouched(target);
                 return !mTargetTouchable;
             }
         }
@@ -286,6 +290,10 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
     public void setDismissOnTargetTouch(boolean dismissOnTargetTouch) {
         mDismissOnTargetTouch = dismissOnTargetTouch;
+    }
+
+    public void onTargetTouched(Target target) {
+
     }
 
     public void addShowcaseListener(IShowcaseListener showcaseListener) {
