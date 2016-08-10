@@ -193,7 +193,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             hide();
         }
         for (Target target : mTargets) {
-            if (target.getBounds().contains((int) event.getX(), (int) event.getY())) {
+            if (touchedInsideTarget(event, target)) {
                 if (mDismissOnTargetTouch) {
                     hide();
                 }
@@ -204,6 +204,9 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         return true;
     }
 
+    protected boolean touchedInsideTarget(MotionEvent event, Target target) {
+        return target.getBounds().contains((int) event.getX(), (int) event.getY());
+    }
 
     private void notifyOnDisplayed() {
 
