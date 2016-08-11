@@ -35,7 +35,7 @@ import uk.co.deanwild.materialshowcaseview.target.ViewTarget;
 /**
  * Helper class to show a sequence of showcase views.
  */
-public class MaterialShowcaseView extends FrameLayout implements View.OnTouchListener, View.OnClickListener {
+public class MaterialShowcaseView extends FrameLayout implements View.OnClickListener {
     private static final int DEFAULT_CONTENT_LAYOUT_ID = R.layout.showcase_content;
 
     private int mOldHeight;
@@ -94,9 +94,6 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         // make sure we add a global layout listener so we can adapt to changes
         mLayoutListener = new UpdateOnGlobalLayout();
         getViewTreeObserver().addOnGlobalLayoutListener(mLayoutListener);
-
-        // consume touch events
-        setOnTouchListener(this);
 
         mMaskColour = Color.parseColor(ShowcaseConfig.DEFAULT_MASK_COLOUR);
         setVisibility(INVISIBLE);
@@ -188,7 +185,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
         if (mDismissOnTouch) {
             hide();
         }
