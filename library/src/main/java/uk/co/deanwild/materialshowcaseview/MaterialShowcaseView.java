@@ -63,8 +63,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnClickLis
     List<IShowcaseListener> mListeners; // external listeners who want to observe when we show and dismiss
     private UpdateOnGlobalLayout mLayoutListener;
     private IDetachedListener mDetachedListener;
-    private boolean mTargetTouchable = false;
-    private boolean mDismissOnTargetTouch = true;
+    protected boolean mTargetTouchable = false;
+    protected boolean mDismissOnTargetTouch = true;
     private ShapeType mShapeType = ShapeType.RECTANGLE_SHAPE;
 
     public MaterialShowcaseView(Context context) {
@@ -82,10 +82,10 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnClickLis
     public MaterialShowcaseView(Context context, AttributeSet attrs, int defStyleAttr, Integer contentResId) {
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);
-
         if (contentResId == null) {
             contentResId = DEFAULT_CONTENT_LAYOUT_ID;
         }
+        mTargets = new ArrayList<>();
         // create our animation factory
         mAnimationFactory = new AnimationFactory();
 
@@ -190,16 +190,24 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnClickLis
         if (mDismissOnTouch) {
             hide();
         }
-        for (Target target : mTargets) {
-            if (touchedInsideTarget(event, target)) {
-                if (mDismissOnTargetTouch) {
-                    hide();
-                }
-                onTargetTouched(target);
-                return !mTargetTouchable;
+        if (touchedInsideTarget(event)) {
+            if (mDismissOnTargetTouch) {
+                hide();
             }
+            return !mTargetTouchable;
         }
         return true;
+    }
+
+    protected boolean touchedInsideTarget(MotionEvent event) {
+        if (mTargets != null) {
+            for (Target target : mTargets) {
+                if (touchedInsideTarget(event, target)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected boolean touchedInsideTarget(MotionEvent event, Target target) {
@@ -291,10 +299,6 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnClickLis
 
     public void setDismissOnTargetTouch(boolean dismissOnTargetTouch) {
         mDismissOnTargetTouch = dismissOnTargetTouch;
-    }
-
-    public void onTargetTouched(Target target) {
-
     }
 
     public void addShowcaseListener(IShowcaseListener showcaseListener) {
