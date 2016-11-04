@@ -5,8 +5,9 @@ This library is heavily inspired by the original [ShowcaseView library][1].
 
 Since Google introduced the Material design philosophy I have seen quite a few apps with a nice clean, flat showcase view (the Youtube app is a good example). The only library out there however is the [original one][1]. This was a great library for a long time but the theming is now looking a bit dated.
 
-![Logo](http://i.imgur.com/QIMYRJh.png)
+About this fork: the original implementation didn't have a skip button. As some users may find frustrating to be stuck in a tutorial sequence I've created a new button that enabled user to skip the remaining items.
 
+![Logo](http://i.imgur.com/QIMYRJh.png)
 
 ![Animation][2]
 
@@ -31,12 +32,12 @@ Then add the dependency to your module's build.gradle:
 
 /app/build.gradle
 ```groovy
-compile 'com.github.deano2390:MaterialShowcaseView:1.1.0'
+compile 'com.github.fibelatti:MaterialShowcaseView:2.0.1'
 ```
 
 NOTE: Some people have mentioned that they needed to add the @aar suffix to get it to resolve from JitPack:
 ```groovy
-compile 'com.github.deano2390:MaterialShowcaseView:1.1.0@aar'
+compile 'com.github.fibelatti:MaterialShowcaseView:2.0.1@aar'
 ```
 
 # How to use
@@ -53,28 +54,25 @@ This is the basic usage of a single showcase view, you should check out the samp
                 .setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
                 .singleUse(SHOWCASE_ID) // provide a unique ID used to ensure it is only shown once
                 .show();
-                
-                
-                
-                
-    	// sequence example            
-    	ShowcaseConfig config = new ShowcaseConfig();
-        config.setDelay(500); // half second between each showcase view
 
-        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
+	// sequence example            
+	ShowcaseConfig config = new ShowcaseConfig();
+    config.setDelay(500); // half second between each showcase view
 
-        sequence.setConfig(config);
+    MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
 
-        sequence.addSequenceItem(mButtonOne,
-                "This is button one", "GOT IT");
+    sequence.setConfig(config);
 
-        sequence.addSequenceItem(mButtonTwo,
-                "This is button two", "GOT IT");
+    sequence.addSequenceItem(mButtonOne,
+            "This is button one", "GOT IT", "SKIP");
 
-        sequence.addSequenceItem(mButtonThree,
-                "This is button three", "GOT IT");
+    sequence.addSequenceItem(mButtonTwo,
+            "This is button two", "GOT IT"), "SKIP";
 
-        sequence.start();
+    sequence.addSequenceItem(mButtonThree,
+            "This is button three", "GOT IT", "SKIP");
+
+    sequence.start();
                 
 ```
 
@@ -108,4 +106,4 @@ Publishing libraries to Maven is a chore that takes time and effort. Jitpack.io 
 [2]: http://i.imgur.com/rFHENgz.gif
 [3]: https://code.google.com/p/android-flowtextview/
 [4]: https://img.shields.io/github/release/deano2390/MaterialShowcaseView.svg?label=JitPack
-[5]: https://jitpack.io/#deano2390/MaterialShowcaseView
+[5]: https://jitpack.io/#fibelatti/MaterialShowcaseView
