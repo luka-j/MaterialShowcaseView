@@ -9,7 +9,8 @@ import uk.co.deanwild.materialshowcaseview.target.Target;
 /**
  * Circular shape for target.
  */
-public class CircleShape implements Shape {
+public class CircleShape
+        implements Shape {
 
     private int radius = 200;
     private boolean adjustToTarget = true;

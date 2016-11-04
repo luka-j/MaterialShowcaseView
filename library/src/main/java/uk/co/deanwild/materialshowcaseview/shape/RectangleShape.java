@@ -7,7 +7,8 @@ import android.graphics.Rect;
 
 import uk.co.deanwild.materialshowcaseview.target.Target;
 
-public class RectangleShape implements Shape {
+public class RectangleShape
+        implements Shape {
 
     private boolean fullWidth = false;
 
@@ -45,7 +46,7 @@ public class RectangleShape implements Shape {
     }
 
     private void init() {
-        rect = new Rect(- width / 2, - height / 2, width / 2, height / 2);
+        rect = new Rect(-width / 2, -height / 2, width / 2, height / 2);
     }
 
     @Override

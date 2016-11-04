@@ -8,7 +8,8 @@ import uk.co.deanwild.materialshowcaseview.target.Target;
 /**
  * A Shape implementation that draws nothing.
  */
-public class NoShape implements Shape {
+public class NoShape
+        implements Shape {
 
     @Override
     public void updateTarget(Target target) {

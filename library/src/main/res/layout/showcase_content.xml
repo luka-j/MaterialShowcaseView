@@ -11,22 +11,34 @@
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:paddingLeft="@dimen/padding_smaller"
         android:textColor="@android:color/white"
-        android:paddingLeft="5dp"
-        android:textSize="30dp"
-        android:layout_marginBottom="15dp" />
+        android:textSize="@dimen/text_size_larger" />
 
     <TextView
         android:id="@+id/tv_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/padding_smaller"
         android:textColor="@android:color/white"
-        android:paddingLeft="5dp"
-        android:textSize="20dp" />
+        android:textSize="@dimen/text_size_regular" />
 
     <TextView
         android:id="@+id/tv_dismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_regular"
         android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:paddingBottom="@dimen/padding_small"
+        android:paddingLeft="@dimen/padding_smaller"
+        android:paddingRight="@dimen/padding_smaller"
+        android:paddingTop="@dimen/padding_small"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_large"
+        android:visibility="gone" />
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"

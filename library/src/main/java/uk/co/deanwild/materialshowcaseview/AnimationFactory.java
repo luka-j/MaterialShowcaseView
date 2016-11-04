@@ -8,7 +8,8 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 
-public class AnimationFactory implements IAnimationFactory{
+public class AnimationFactory
+        implements IAnimationFactory {
 
     private static final String ALPHA = "alpha";
     private static final float INVISIBLE = 0f;

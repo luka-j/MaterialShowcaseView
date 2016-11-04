@@ -7,7 +7,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 
-public class MaterialShowcaseSequence implements IDetachedListener {
+public class MaterialShowcaseSequence
+        implements IDetachedListener {
 
     PrefsManager mPrefsManager;
     Queue<MaterialShowcaseView> mShowcaseQueue;
