@@ -39,16 +39,19 @@
         android:textSize="@dimen/text_size_large"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/tv_skip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/margin_smaller"
+        android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
+        android:paddingBottom="@dimen/padding_small"
+        android:paddingLeft="@dimen/padding_smaller"
+        android:paddingRight="@dimen/padding_smaller"
+        android:paddingTop="@dimen/padding_small"
         android:textColor="@android:color/white"
-        android:textSize="22dp"
+        android:textSize="@dimen/text_size_large"
         android:visibility="gone" />
 
 </LinearLayout>

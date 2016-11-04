@@ -18,6 +18,7 @@ public class ShowcaseConfig {
     private int mMaskColour;
     private int mContentTextColor;
     private int mDismissTextColor;
+    private int mSkipTextColor;
     private long mFadeDuration = DEFAULT_FADE_TIME;
     private Shape mShape = DEFAULT_SHAPE;
     private int mShapePadding = DEFAULT_SHAPE_PADDING;
@@ -27,6 +28,7 @@ public class ShowcaseConfig {
         mMaskColour = Color.parseColor(ShowcaseConfig.DEFAULT_MASK_COLOUR);
         mContentTextColor = Color.parseColor("#ffffff");
         mDismissTextColor = Color.parseColor("#ffffff");
+        mSkipTextColor = Color.parseColor("#ffffff");
     }
 
     public long getDelay() {
@@ -59,6 +61,14 @@ public class ShowcaseConfig {
 
     public void setDismissTextColor(int dismissTextColor) {
         this.mDismissTextColor = dismissTextColor;
+    }
+
+    public int getSkipTextColor() {
+        return mSkipTextColor;
+    }
+
+    public void setSkipTextColor(int skipTextColor) {
+        this.mSkipTextColor = skipTextColor;
     }
 
     public long getFadeDuration() {

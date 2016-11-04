@@ -35,7 +35,6 @@ import uk.co.deanwild.materialshowcaseview.shape.Shape;
 import uk.co.deanwild.materialshowcaseview.target.Target;
 import uk.co.deanwild.materialshowcaseview.target.ViewTarget;
 
-
 /**
  * Helper class to show a sequence of showcase views.
  */
@@ -53,12 +52,15 @@ public class MaterialShowcaseView
     private int mXPosition;
     private int mYPosition;
     private boolean mWasDismissed = false;
+    private boolean mWasSkipped = false;
+    private boolean mIsSequence = false;
     private int mShapePadding = ShowcaseConfig.DEFAULT_SHAPE_PADDING;
 
     private View mContentBox;
     private TextView mTitleTextView;
     private TextView mContentTextView;
     private TextView mDismissButton;
+    private TextView mSkipButton;
     private int mGravity;
     private int mContentBottomMargin;
     private int mContentTopMargin;
@@ -101,7 +103,6 @@ public class MaterialShowcaseView
         init(context);
     }
 
-
     private void init(Context context) {
         setWillNotDraw(false);
 
@@ -120,15 +121,15 @@ public class MaterialShowcaseView
         mMaskColour = Color.parseColor(ShowcaseConfig.DEFAULT_MASK_COLOUR);
         setVisibility(INVISIBLE);
 
-
         View contentView = LayoutInflater.from(getContext()).inflate(R.layout.showcase_content, this, true);
         mContentBox = contentView.findViewById(R.id.content_box);
         mTitleTextView = (TextView) contentView.findViewById(R.id.tv_title);
         mContentTextView = (TextView) contentView.findViewById(R.id.tv_content);
         mDismissButton = (TextView) contentView.findViewById(R.id.tv_dismiss);
         mDismissButton.setOnClickListener(this);
+        mSkipButton = (TextView) contentView.findViewById(R.id.tv_skip);
+        mSkipButton.setOnClickListener(this);
     }
-
 
     /**
      * Interesting drawing stuff.
@@ -199,9 +200,7 @@ public class MaterialShowcaseView
             mPrefsManager.resetShowcase();
         }
 
-
         notifyOnDismissed();
-
     }
 
     @Override
@@ -217,7 +216,6 @@ public class MaterialShowcaseView
         }
         return true;
     }
-
 
     private void notifyOnDisplayed() {
 
@@ -242,7 +240,7 @@ public class MaterialShowcaseView
          * internal listener used by sequence for storing progress within the sequence
          */
         if (mDetachedListener != null) {
-            mDetachedListener.onShowcaseDetached(this, mWasDismissed);
+            mDetachedListener.onShowcaseDetached(this, mWasDismissed, mWasSkipped);
         }
     }
 
@@ -253,7 +251,11 @@ public class MaterialShowcaseView
      */
     @Override
     public void onClick(View v) {
-        hide();
+        if (v.getId() == R.id.tv_dismiss) {
+            hide();
+        } else {
+            skip();
+        }
     }
 
     /**
@@ -266,8 +268,8 @@ public class MaterialShowcaseView
     public void setTarget(Target target) {
         mTarget = target;
 
-        // update dismiss button state
-        updateDismissButton();
+        // update dismiss and skip button state
+        updateButtonsState();
 
         if (mTarget != null) {
 
@@ -347,7 +349,6 @@ public class MaterialShowcaseView
     /**
      * SETTERS
      */
-
     void setPosition(Point point) {
         setPosition(point.x, point.y);
     }
@@ -374,7 +375,15 @@ public class MaterialShowcaseView
         if (mDismissButton != null) {
             mDismissButton.setText(dismissText);
 
-            updateDismissButton();
+            updateButtonsState();
+        }
+    }
+
+    private void setSkipText(CharSequence skipText) {
+        if (mSkipButton != null) {
+            mSkipButton.setText(skipText);
+
+            updateButtonsState();
         }
     }
 
@@ -393,6 +402,12 @@ public class MaterialShowcaseView
     private void setDismissTextColor(int textColour) {
         if (mDismissButton != null) {
             mDismissButton.setTextColor(textColour);
+        }
+    }
+
+    private void setSkipTextColor(int textColour) {
+        if (mSkipButton != null) {
+            mSkipButton.setTextColor(textColour);
         }
     }
 
@@ -459,19 +474,32 @@ public class MaterialShowcaseView
         setFadeDuration(config.getFadeDuration());
         setContentTextColor(config.getContentTextColor());
         setDismissTextColor(config.getDismissTextColor());
+        setSkipTextColor(config.getSkipTextColor());
         setMaskColour(config.getMaskColor());
         setShape(config.getShape());
         setShapePadding(config.getShapePadding());
         setRenderOverNavigationBar(config.getRenderOverNavigationBar());
     }
 
-    private void updateDismissButton() {
+    private void setIsSequence(Boolean isSequence) {
+        mIsSequence = isSequence;
+    }
+
+    private void updateButtonsState() {
         // hide or show button
         if (mDismissButton != null) {
             if (TextUtils.isEmpty(mDismissButton.getText())) {
                 mDismissButton.setVisibility(GONE);
             } else {
                 mDismissButton.setVisibility(VISIBLE);
+            }
+        }
+
+        if (mSkipButton != null) {
+            if (mIsSequence && !TextUtils.isEmpty(mSkipButton.getText())) {
+                mSkipButton.setVisibility(VISIBLE);
+            } else {
+                mSkipButton.setVisibility(GONE);
             }
         }
     }
@@ -523,8 +551,13 @@ public class MaterialShowcaseView
             return this;
         }
 
+        public Builder setIsSequence(Boolean isSequence) {
+            showcaseView.setIsSequence(isSequence);
+            return this;
+        }
+
         /**
-         * Set the title text shown on the ShowcaseView.
+         * Set the dismiss text shown on the ShowcaseView.
          */
         public Builder setDismissText(int resId) {
             return setDismissText(activity.getString(resId));
@@ -532,6 +565,18 @@ public class MaterialShowcaseView
 
         public Builder setDismissText(CharSequence dismissText) {
             showcaseView.setDismissText(dismissText);
+            return this;
+        }
+
+        /**
+         * Set the skip text shown on the ShowcaseView.
+         */
+        public Builder setSkipText(int resId) {
+            return setSkipText(activity.getString(resId));
+        }
+
+        public Builder setSkipText(CharSequence skipText) {
+            showcaseView.setSkipText(skipText);
             return this;
         }
 
@@ -607,6 +652,11 @@ public class MaterialShowcaseView
 
         public Builder setDismissTextColor(int textColour) {
             showcaseView.setDismissTextColor(textColour);
+            return this;
+        }
+
+        public Builder setSkipTextColor(int textColour) {
+            showcaseView.setSkipTextColor(textColour);
             return this;
         }
 
@@ -693,7 +743,6 @@ public class MaterialShowcaseView
             build().show(activity);
             return showcaseView;
         }
-
     }
 
     private void singleUse(String showcaseID) {
@@ -723,10 +772,7 @@ public class MaterialShowcaseView
             mPrefsManager.close();
 
         mPrefsManager = null;
-
-
     }
-
 
     /**
      * Reveal the showcaseview. Returns a boolean telling us whether we actually did show anything
@@ -765,7 +811,7 @@ public class MaterialShowcaseView
             }
         }, mDelayInMillis);
 
-        updateDismissButton();
+        updateButtonsState();
 
         return true;
     }
@@ -777,6 +823,19 @@ public class MaterialShowcaseView
          * This flag is used to indicate to onDetachedFromWindow that the showcase view was dismissed purposefully (by the user or programmatically)
          */
         mWasDismissed = true;
+
+        if (mShouldAnimate) {
+            fadeOut();
+        } else {
+            removeFromWindow();
+        }
+    }
+
+    public void skip() {
+        /**
+         * This flag is used to indicate to onDetachedFromWindow that the showcase view was skipped purposefully (by the user or programmatically)
+         */
+        mWasSkipped = true;
 
         if (mShouldAnimate) {
             fadeOut();

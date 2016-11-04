@@ -6,7 +6,6 @@ import android.view.View;
 import java.util.LinkedList;
 import java.util.Queue;
 
-
 public class MaterialShowcaseSequence
         implements IDetachedListener {
 
@@ -19,6 +18,7 @@ public class MaterialShowcaseSequence
 
     private OnSequenceItemShownListener mOnItemShownListener = null;
     private OnSequenceItemDismissedListener mOnItemDismissedListener = null;
+    private OnSequenceSkippedListener mOnSequenceSkippedListener = null;
 
     public MaterialShowcaseSequence(Activity activity) {
         mActivity = activity;
@@ -30,18 +30,20 @@ public class MaterialShowcaseSequence
         this.singleUse(sequenceID);
     }
 
-    public MaterialShowcaseSequence addSequenceItem(View targetView, String content, String dismissText) {
-        addSequenceItem(targetView, "", content, dismissText);
+    public MaterialShowcaseSequence addSequenceItem(View targetView, String content, String dismissText, String skipText) {
+        addSequenceItem(targetView, "", content, dismissText, skipText);
         return this;
     }
 
-    public MaterialShowcaseSequence addSequenceItem(View targetView, String title, String content, String dismissText) {
+    public MaterialShowcaseSequence addSequenceItem(View targetView, String title, String content, String dismissText, String skipText) {
 
         MaterialShowcaseView sequenceItem = new MaterialShowcaseView.Builder(mActivity)
                 .setTarget(targetView)
                 .setTitleText(title)
                 .setDismissText(dismissText)
+                .setSkipText(skipText)
                 .setContentText(content)
+                .setIsSequence(true)
                 .build();
 
         if (mConfig != null) {
@@ -69,6 +71,10 @@ public class MaterialShowcaseSequence
 
     public void setOnItemDismissedListener(OnSequenceItemDismissedListener listener) {
         this.mOnItemDismissedListener = listener;
+    }
+
+    public void setOnSequenceSkippedListener(OnSequenceSkippedListener listener) {
+        this.mOnSequenceSkippedListener = listener;
     }
 
     public boolean hasFired() {
@@ -128,9 +134,16 @@ public class MaterialShowcaseSequence
         }
     }
 
+    private void skipEntireSequence() {
+        mShowcaseQueue.clear();
+
+        if (mSingleUse) {
+            mPrefsManager.setFired();
+        }
+    }
 
     @Override
-    public void onShowcaseDetached(MaterialShowcaseView showcaseView, boolean wasDismissed) {
+    public void onShowcaseDetached(MaterialShowcaseView showcaseView, boolean wasDismissed, boolean wasSkipped) {
 
         showcaseView.setDetachedListener(null);
 
@@ -153,6 +166,22 @@ public class MaterialShowcaseSequence
 
             showNextItem();
         }
+
+        if (wasSkipped) {
+            if (mOnSequenceSkippedListener != null) {
+                mOnSequenceSkippedListener.onSkip(this);
+            }
+
+            /**
+             * If so, update the prefsManager so we can potentially resume this sequence in the future
+             */
+            if (mPrefsManager != null) {
+                mSequencePosition++;
+                mPrefsManager.setSequenceStatus(mSequencePosition);
+            }
+
+            skipEntireSequence();
+        }
     }
 
     public void setConfig(ShowcaseConfig config) {
@@ -167,4 +196,7 @@ public class MaterialShowcaseSequence
         void onDismiss(MaterialShowcaseView itemView, int position);
     }
 
+    public interface OnSequenceSkippedListener {
+        void onSkip(MaterialShowcaseSequence sequence);
+    }
 }
