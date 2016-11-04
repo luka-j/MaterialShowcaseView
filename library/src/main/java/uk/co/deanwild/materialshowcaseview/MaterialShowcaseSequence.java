@@ -55,6 +55,7 @@ public class MaterialShowcaseSequence
     }
 
     public MaterialShowcaseSequence addSequenceItem(MaterialShowcaseView sequenceItem) {
+        sequenceItem.setIsSequence(true);
         mShowcaseQueue.add(sequenceItem);
         return this;
     }

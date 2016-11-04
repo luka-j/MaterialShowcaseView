@@ -481,7 +481,7 @@ public class MaterialShowcaseView
         setRenderOverNavigationBar(config.getRenderOverNavigationBar());
     }
 
-    private void setIsSequence(Boolean isSequence) {
+    public void setIsSequence(Boolean isSequence) {
         mIsSequence = isSequence;
     }
 

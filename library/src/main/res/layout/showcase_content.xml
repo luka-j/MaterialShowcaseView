@@ -43,7 +43,7 @@
         android:id="@+id/tv_skip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_smaller"
+        android:layout_marginTop="@dimen/margin_regular"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:paddingBottom="@dimen/padding_small"
@@ -51,7 +51,7 @@
         android:paddingRight="@dimen/padding_smaller"
         android:paddingTop="@dimen/padding_small"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/text_size_large"
+        android:textSize="@dimen/text_size_small"
         android:visibility="gone" />
 
 </LinearLayout>
