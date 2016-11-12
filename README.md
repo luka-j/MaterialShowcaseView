@@ -7,6 +7,8 @@ Since Google introduced the Material design philosophy I have seen quite a few a
 
 About this fork: the original implementation didn't have a skip button. As some users may find frustrating to be stuck in a tutorial sequence I've created a new button that enabled user to skip the remaining items.
 
+I've also added the option to use a Button instead of a TextView to skip (default is still TextView). 
+
 ![Logo](http://i.imgur.com/QIMYRJh.png)
 
 ![Animation][2]
@@ -32,12 +34,12 @@ Then add the dependency to your module's build.gradle:
 
 /app/build.gradle
 ```groovy
-compile 'com.github.fibelatti:MaterialShowcaseView:2.0.1'
+compile 'com.github.fibelatti:MaterialShowcaseView:2.1.0'
 ```
 
 NOTE: Some people have mentioned that they needed to add the @aar suffix to get it to resolve from JitPack:
 ```groovy
-compile 'com.github.fibelatti:MaterialShowcaseView:2.0.1@aar'
+compile 'com.github.fibelatti:MaterialShowcaseView:2.1.0@aar'
 ```
 
 # How to use
@@ -49,6 +51,18 @@ This is the basic usage of a single showcase view, you should check out the samp
 	// single example
 	new MaterialShowcaseView.Builder(this)
                 .setTarget(mButtonShow)
+                .setDismissText("GOT IT")
+                .setContentText("This is some amazing feature you should know about")
+                .setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
+                .singleUse(SHOWCASE_ID) // provide a unique ID used to ensure it is only shown once
+                .show();
+
+    // single example with button
+    new MaterialShowcaseView.Builder(this)
+                .setTarget(mButtonShow)
+                .withButtonDismissStyle()
+                .withWhiteDismissButton()
+                .setDismissTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setDismissText("GOT IT")
                 .setContentText("This is some amazing feature you should know about")
                 .setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
@@ -76,10 +90,36 @@ This is the basic usage of a single showcase view, you should check out the samp
                 
 ```
 
+# Button styles
+--------
+
+If you decided to use a Button to skip each tutorial by calling `.withButtonDismissStyle()` there are 21 themes that you can use (the same color palette as provided by [Material Palette](https://www.materialpalette.com/)):
+
+- `.withWhiteDismissButton()`
+- `.withBlackDismissButton()`
+- `.withRedDismissButton()`
+- `.withPinkDismissButton()`
+- `.withPurpleDismissButton()`
+- `.withDeepPurpleDismissButton()`
+- `.withIndigoDismissButton()`
+- `.withBlueDismissButton()`
+- `.withLightBlueDismissButton()`
+- `.withCyanDismissButton()`
+- `.withTealDismissButton()`
+- `.withGreenDismissButton()`
+- `.withLightGreenDismissButton()`
+- `.withLimeDismissButton()`
+- `.withYellowDismissButton()`
+- `.withAmberDismissButton()`
+- `.withOrangeDismissButton()`
+- `.withDeepOrangeDismissButton()`
+- `.withBrownDismissButton()`
+- `.withGrayDismissButton()`
+- `.withBlueGrayDismissButton()`
+
 # Why Jitpack
 ------------
 Publishing libraries to Maven is a chore that takes time and effort. Jitpack.io allows me to release without ever leaving GitHub so I can release easily and more often.
-
 
 # License
 -------
@@ -97,9 +137,6 @@ Publishing libraries to Maven is a chore that takes time and effort. Jitpack.io 
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
-
-
 
 
 [1]: https://github.com/amlcurran/ShowcaseView
