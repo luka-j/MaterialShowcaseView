@@ -5,19 +5,24 @@ import android.graphics.Color;
 import uk.co.deanwild.materialshowcaseview.shape.CircleShape;
 import uk.co.deanwild.materialshowcaseview.shape.Shape;
 
-
 public class ShowcaseConfig {
+    public static final int DISMISS_STYLE_TEXT = 0;
+    public static final int DISMISS_STYLE_BUTTON = 1;
 
     public static final String DEFAULT_MASK_COLOUR = "#dd335075";
+    public static final int DEFAULT_DISMISS_STYLE = DISMISS_STYLE_TEXT;
+    public static final int DEFAULT_DISMISS_BUTTON_STYLE = R.drawable.gray_button;
     public static final long DEFAULT_FADE_TIME = 300;
     public static final long DEFAULT_DELAY = 0;
     public static final Shape DEFAULT_SHAPE = new CircleShape();
     public static final int DEFAULT_SHAPE_PADDING = 10;
 
     private long mDelay = DEFAULT_DELAY;
-    private int mMaskColour;
+    private int mMaskColor;
     private int mContentTextColor;
+    private int mDismissStyle;
     private int mDismissTextColor;
+    private int mDismissButtonStyle;
     private int mSkipTextColor;
     private long mFadeDuration = DEFAULT_FADE_TIME;
     private Shape mShape = DEFAULT_SHAPE;
@@ -25,9 +30,11 @@ public class ShowcaseConfig {
     private boolean renderOverNav = false;
 
     public ShowcaseConfig() {
-        mMaskColour = Color.parseColor(ShowcaseConfig.DEFAULT_MASK_COLOUR);
+        mMaskColor = Color.parseColor(ShowcaseConfig.DEFAULT_MASK_COLOUR);
         mContentTextColor = Color.parseColor("#ffffff");
+        mDismissStyle = ShowcaseConfig.DEFAULT_DISMISS_STYLE;
         mDismissTextColor = Color.parseColor("#ffffff");
+        mDismissButtonStyle = DEFAULT_DISMISS_BUTTON_STYLE;
         mSkipTextColor = Color.parseColor("#ffffff");
     }
 
@@ -40,11 +47,11 @@ public class ShowcaseConfig {
     }
 
     public int getMaskColor() {
-        return mMaskColour;
+        return mMaskColor;
     }
 
     public void setMaskColor(int maskColor) {
-        mMaskColour = maskColor;
+        mMaskColor = maskColor;
     }
 
     public int getContentTextColor() {
@@ -55,12 +62,28 @@ public class ShowcaseConfig {
         this.mContentTextColor = mContentTextColor;
     }
 
+    public int getDismissStyle() {
+        return mDismissStyle;
+    }
+
+    public void setDismissStyle(int dismissStyle) {
+        this.mDismissButtonStyle = dismissStyle;
+    }
+
     public int getDismissTextColor() {
         return mDismissTextColor;
     }
 
     public void setDismissTextColor(int dismissTextColor) {
         this.mDismissTextColor = dismissTextColor;
+    }
+
+    public int getDismissButtonStyle() {
+        return mDismissButtonStyle;
+    }
+
+    public void setDismissButtonStyle(int dismissButtonStyle) {
+        this.mDismissButtonStyle = dismissButtonStyle;
     }
 
     public int getSkipTextColor() {
@@ -87,12 +110,12 @@ public class ShowcaseConfig {
         this.mShape = shape;
     }
 
-    public void setShapePadding(int padding) {
-        this.mShapePadding = padding;
-    }
-
     public int getShapePadding() {
         return mShapePadding;
+    }
+
+    public void setShapePadding(int padding) {
+        this.mShapePadding = padding;
     }
 
     public boolean getRenderOverNavigationBar() {

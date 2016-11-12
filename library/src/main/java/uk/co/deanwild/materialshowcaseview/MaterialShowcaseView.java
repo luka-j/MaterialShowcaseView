@@ -22,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -42,6 +43,7 @@ public class MaterialShowcaseView
         extends FrameLayout
         implements View.OnTouchListener, View.OnClickListener {
 
+    //region declarations
     private int mOldHeight;
     private int mOldWidth;
     private Bitmap mBitmap;// = new WeakReference<>(null);
@@ -59,8 +61,10 @@ public class MaterialShowcaseView
     private View mContentBox;
     private TextView mTitleTextView;
     private TextView mContentTextView;
-    private TextView mDismissButton;
-    private TextView mSkipButton;
+    private int mDismissStyle;
+    private TextView mDismissTextButton;
+    private TextView mSkipTextButton;
+    private Button mDismissButton;
     private int mGravity;
     private int mContentBottomMargin;
     private int mContentTopMargin;
@@ -81,6 +85,7 @@ public class MaterialShowcaseView
     private IDetachedListener mDetachedListener;
     private boolean mTargetTouchable = false;
     private boolean mDismissOnTargetTouch = true;
+    //endregion declarations
 
     public MaterialShowcaseView(Context context) {
         super(context);
@@ -125,10 +130,12 @@ public class MaterialShowcaseView
         mContentBox = contentView.findViewById(R.id.content_box);
         mTitleTextView = (TextView) contentView.findViewById(R.id.tv_title);
         mContentTextView = (TextView) contentView.findViewById(R.id.tv_content);
-        mDismissButton = (TextView) contentView.findViewById(R.id.tv_dismiss);
+        mDismissTextButton = (TextView) contentView.findViewById(R.id.tv_dismiss);
+        mDismissTextButton.setOnClickListener(this);
+        mDismissButton = (Button) contentView.findViewById(R.id.button_dismiss);
         mDismissButton.setOnClickListener(this);
-        mSkipButton = (TextView) contentView.findViewById(R.id.tv_skip);
-        mSkipButton.setOnClickListener(this);
+        mSkipTextButton = (TextView) contentView.findViewById(R.id.tv_skip);
+        mSkipTextButton.setOnClickListener(this);
     }
 
     /**
@@ -154,7 +161,6 @@ public class MaterialShowcaseView
 
         // build a new canvas if needed i.e first pass or new dimensions
         if (mBitmap == null || mCanvas == null || mOldHeight != height || mOldWidth != width) {
-
             if (mBitmap != null) mBitmap.recycle();
 
             mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -205,20 +211,17 @@ public class MaterialShowcaseView
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (mDismissOnTouch) {
-            hide();
-        }
+        if (mDismissOnTouch) hide();
         if (mTargetTouchable && mTarget.getBounds().contains((int) event.getX(), (int) event.getY())) {
-            if (mDismissOnTargetTouch) {
-                hide();
-            }
+            if (mDismissOnTargetTouch) hide();
+
             return false;
         }
+
         return true;
     }
 
     private void notifyOnDisplayed() {
-
         if (mListeners != null) {
             for (IShowcaseListener listener : mListeners) {
                 listener.onShowcaseDisplayed(this);
@@ -251,7 +254,7 @@ public class MaterialShowcaseView
      */
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.tv_dismiss) {
+        if (v.getId() == R.id.tv_dismiss || v.getId() == R.id.button_dismiss) {
             hide();
         } else {
             skip();
@@ -317,7 +320,6 @@ public class MaterialShowcaseView
     }
 
     private void applyLayoutParams() {
-
         if (mContentBox != null && mContentBox.getLayoutParams() != null) {
             FrameLayout.LayoutParams contentLP = (LayoutParams) mContentBox.getLayoutParams();
 
@@ -372,16 +374,24 @@ public class MaterialShowcaseView
     }
 
     private void setDismissText(CharSequence dismissText) {
-        if (mDismissButton != null) {
-            mDismissButton.setText(dismissText);
+        if (mDismissStyle == ShowcaseConfig.DISMISS_STYLE_TEXT) {
+            if (mDismissTextButton != null) {
+                mDismissTextButton.setText(dismissText);
 
-            updateButtonsState();
+                updateButtonsState();
+            }
+        } else if (mDismissStyle == ShowcaseConfig.DISMISS_STYLE_BUTTON) {
+            if (mDismissButton != null) {
+                mDismissButton.setText(dismissText);
+
+                updateButtonsState();
+            }
         }
     }
 
     private void setSkipText(CharSequence skipText) {
-        if (mSkipButton != null) {
-            mSkipButton.setText(skipText);
+        if (mSkipTextButton != null) {
+            mSkipTextButton.setText(skipText);
 
             updateButtonsState();
         }
@@ -399,15 +409,39 @@ public class MaterialShowcaseView
         }
     }
 
+    private void setDismissStyle(int dismissStyle) {
+        mDismissStyle = dismissStyle;
+
+        if (mDismissStyle == ShowcaseConfig.DISMISS_STYLE_TEXT) {
+            mDismissTextButton.setVisibility(VISIBLE);
+            mDismissButton.setVisibility(GONE);
+        } else if (mDismissStyle == ShowcaseConfig.DISMISS_STYLE_BUTTON) {
+            mDismissTextButton.setVisibility(GONE);
+            mDismissButton.setVisibility(VISIBLE);
+        }
+    }
+
     private void setDismissTextColor(int textColour) {
+        if (mDismissStyle == ShowcaseConfig.DISMISS_STYLE_TEXT) {
+            if (mDismissTextButton != null) {
+                mDismissTextButton.setTextColor(textColour);
+            }
+        } else if (mDismissStyle == ShowcaseConfig.DISMISS_STYLE_BUTTON) {
+            if (mDismissButton != null) {
+                mDismissButton.setTextColor(textColour);
+            }
+        }
+    }
+
+    private void setDismissButtonStyle(int drawableId) {
         if (mDismissButton != null) {
-            mDismissButton.setTextColor(textColour);
+            mDismissButton.setBackground(getResources().getDrawable(drawableId));
         }
     }
 
     private void setSkipTextColor(int textColour) {
-        if (mSkipButton != null) {
-            mSkipButton.setTextColor(textColour);
+        if (mSkipTextButton != null) {
+            mSkipTextButton.setTextColor(textColour);
         }
     }
 
@@ -473,7 +507,9 @@ public class MaterialShowcaseView
         setDelay(config.getDelay());
         setFadeDuration(config.getFadeDuration());
         setContentTextColor(config.getContentTextColor());
+        setDismissStyle(config.getDismissStyle());
         setDismissTextColor(config.getDismissTextColor());
+        setDismissButtonStyle(config.getDismissButtonStyle());
         setSkipTextColor(config.getSkipTextColor());
         setMaskColour(config.getMaskColor());
         setShape(config.getShape());
@@ -486,20 +522,41 @@ public class MaterialShowcaseView
     }
 
     private void updateButtonsState() {
-        // hide or show button
-        if (mDismissButton != null) {
-            if (TextUtils.isEmpty(mDismissButton.getText())) {
-                mDismissButton.setVisibility(GONE);
+        if (mDismissStyle == ShowcaseConfig.DISMISS_STYLE_TEXT) {
+            if (mDismissTextButton != null) {
+                if (TextUtils.isEmpty(mDismissTextButton.getText())) {
+                    mDismissTextButton.setVisibility(GONE);
+                } else {
+                    mDismissTextButton.setVisibility(VISIBLE);
+                }
+            }
+
+            mDismissButton.setVisibility(GONE);
+        } else if (mDismissStyle == ShowcaseConfig.DISMISS_STYLE_BUTTON) {
+            if (mDismissButton != null) {
+                if (TextUtils.isEmpty(mDismissButton.getText())) {
+                    mDismissButton.setVisibility(GONE);
+                } else {
+                    mDismissButton.setVisibility(VISIBLE);
+                }
+            }
+
+            mDismissTextButton.setVisibility(GONE);
+        }
+
+        if (mDismissTextButton != null) {
+            if (TextUtils.isEmpty(mDismissTextButton.getText())) {
+                mDismissTextButton.setVisibility(GONE);
             } else {
-                mDismissButton.setVisibility(VISIBLE);
+                mDismissTextButton.setVisibility(VISIBLE);
             }
         }
 
-        if (mSkipButton != null) {
-            if (mIsSequence && !TextUtils.isEmpty(mSkipButton.getText())) {
-                mSkipButton.setVisibility(VISIBLE);
+        if (mSkipTextButton != null) {
+            if (mIsSequence && !TextUtils.isEmpty(mSkipTextButton.getText())) {
+                mSkipTextButton.setVisibility(VISIBLE);
             } else {
-                mSkipButton.setVisibility(GONE);
+                mSkipTextButton.setVisibility(GONE);
             }
         }
     }
@@ -519,7 +576,6 @@ public class MaterialShowcaseView
             setTarget(mTarget);
         }
     }
-
 
     /**
      * BUILDER CLASS
@@ -557,6 +613,22 @@ public class MaterialShowcaseView
         }
 
         /**
+         * Set the dismiss style on the ShowcaseView: text.
+         */
+        public Builder withTextDismissStyle() {
+            showcaseView.setDismissStyle(ShowcaseConfig.DISMISS_STYLE_TEXT);
+            return this;
+        }
+
+        /**
+         * Set the dismiss style on the ShowcaseView: button.
+         */
+        public Builder withButtonDismissStyle() {
+            showcaseView.setDismissStyle(ShowcaseConfig.DISMISS_STYLE_BUTTON);
+            return this;
+        }
+
+        /**
          * Set the dismiss text shown on the ShowcaseView.
          */
         public Builder setDismissText(int resId) {
@@ -565,6 +637,115 @@ public class MaterialShowcaseView
 
         public Builder setDismissText(CharSequence dismissText) {
             showcaseView.setDismissText(dismissText);
+            return this;
+        }
+
+        /**
+         * All dismiss button styles
+         */
+
+        public Builder withWhiteDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.white_button);
+            return this;
+        }
+
+        public Builder withBlackDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.black_button);
+            return this;
+        }
+
+        public Builder withRedDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.red_button);
+            return this;
+        }
+
+        public Builder withPinkDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.pink_button);
+            return this;
+        }
+
+        public Builder withPurpleDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.purple_button);
+            return this;
+        }
+
+        public Builder withDeepPurpleDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.deep_purple_button);
+            return this;
+        }
+
+        public Builder withIndigoDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.indigo_button);
+            return this;
+        }
+
+        public Builder withBlueDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.blue_button);
+            return this;
+        }
+
+        public Builder withLightBlueDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.light_blue_button);
+            return this;
+        }
+
+        public Builder withCyanDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.cyan_button);
+            return this;
+        }
+
+        public Builder withTealDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.teal_button);
+            return this;
+        }
+
+        public Builder withGreenDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.green_button);
+            return this;
+        }
+
+        public Builder withLightGreenDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.light_green_button);
+            return this;
+        }
+
+        public Builder withLimeDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.lime_button);
+            return this;
+        }
+
+        public Builder withYellowDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.yellow_button);
+            return this;
+        }
+
+        public Builder withAmberDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.amber_button);
+            return this;
+        }
+
+        public Builder withOrangeDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.orange_button);
+            return this;
+        }
+
+        public Builder withDeepOrangeDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.deep_orange_button);
+            return this;
+        }
+
+        public Builder withBrownDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.brown_button);
+            return this;
+        }
+
+        public Builder withGrayDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.gray_button);
+            return this;
+        }
+
+        public Builder withBlueGrayDismissButton() {
+            showcaseView.setDismissButtonStyle(R.drawable.blue_gray_button);
             return this;
         }
 
