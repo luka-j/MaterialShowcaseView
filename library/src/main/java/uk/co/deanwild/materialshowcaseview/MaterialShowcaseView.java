@@ -3,6 +3,7 @@ package uk.co.deanwild.materialshowcaseview;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,12 +17,15 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -31,6 +35,7 @@ import java.util.List;
 
 import uk.co.deanwild.materialshowcaseview.shape.CircleShape;
 import uk.co.deanwild.materialshowcaseview.shape.NoShape;
+import uk.co.deanwild.materialshowcaseview.shape.OvalShape;
 import uk.co.deanwild.materialshowcaseview.shape.RectangleShape;
 import uk.co.deanwild.materialshowcaseview.shape.Shape;
 import uk.co.deanwild.materialshowcaseview.target.Target;
@@ -43,6 +48,7 @@ public class MaterialShowcaseView
         extends FrameLayout
         implements View.OnTouchListener, View.OnClickListener {
 
+    private static final String TAG = "MaterialShowcaseView";
     //region declarations
     private int mOldHeight;
     private int mOldWidth;
@@ -212,7 +218,7 @@ public class MaterialShowcaseView
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if (mDismissOnTouch) hide();
-        if (mTargetTouchable && mTarget.getBounds().contains((int) event.getX(), (int) event.getY())) {
+        if (mTargetTouchable && mTarget != null && mTarget.getBounds().contains((int) event.getX(), (int) event.getY())) {
             if (mDismissOnTargetTouch) hide();
 
             return false;
@@ -348,6 +354,20 @@ public class MaterialShowcaseView
         }
     }
 
+    private int dpToPx(int dp) {
+        Resources r  = getResources();
+        float     px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+        return (int)px;
+    }
+
+    private void setTopMargin(int dp) {
+        mContentTopMargin = dpToPx(dp);
+    }
+
+    private void setBotMargin(int dp) {
+        mContentBottomMargin = dpToPx(dp);
+    }
+
     /**
      * SETTERS
      */
@@ -362,7 +382,7 @@ public class MaterialShowcaseView
 
     private void setTitleText(CharSequence contentText) {
         if (mTitleTextView != null && !contentText.equals("")) {
-            mContentTextView.setAlpha(0.5F);
+            mContentTextView.setAlpha(0.8F);
             mTitleTextView.setText(contentText);
         }
     }
@@ -370,6 +390,14 @@ public class MaterialShowcaseView
     private void setContentText(CharSequence contentText) {
         if (mContentTextView != null) {
             mContentTextView.setText(contentText);
+        }
+    }
+
+    private void setDismissTextSizeSp(int size) {
+        if(mDismissStyle == ShowcaseConfig.DISMISS_STYLE_TEXT) {
+            mDismissTextButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
+        } else {
+            mDismissButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
         }
     }
 
@@ -434,8 +462,14 @@ public class MaterialShowcaseView
     }
 
     private void setDismissButtonStyle(int drawableId) {
-        if (mDismissButton != null) {
+        if (mDismissButton != null && Build.VERSION.SDK_INT >= 16) {
             mDismissButton.setBackground(getResources().getDrawable(drawableId));
+        }
+    }
+
+    private void setDismissButtonColor(int color) {
+        if (mDismissButton != null && Build.VERSION.SDK_INT >= 16) {
+            mDismissButton.setBackgroundColor(color);
         }
     }
 
@@ -512,9 +546,13 @@ public class MaterialShowcaseView
         setDismissButtonStyle(config.getDismissButtonStyle());
         setSkipTextColor(config.getSkipTextColor());
         setMaskColour(config.getMaskColor());
-        setShape(config.getShape());
+        if(config.getShape() != null) setShape(config.getShape());
         setShapePadding(config.getShapePadding());
         setRenderOverNavigationBar(config.getRenderOverNavigationBar());
+        setTopMargin(config.getContentTopMargin());
+        setBotMargin(config.getContentBotMargin());
+        setDismissTextSizeSp(config.getDismissTextSize());
+        setDismissButtonColor(config.getDismissButtonColor());
     }
 
     public void setIsSequence(Boolean isSequence) {
@@ -565,6 +603,11 @@ public class MaterialShowcaseView
         return mPrefsManager.hasFired();
     }
 
+    public static boolean hasAlreadyFired(Context c, String id) {
+        if(id == null) return false;
+        return new PrefsManager(c, id).hasFired();
+    }
+
     /**
      * REDRAW LISTENER - this ensures we redraw after activity finishes laying out
      */
@@ -582,9 +625,10 @@ public class MaterialShowcaseView
      * Gives us a builder utility class with a fluent API for eaily configuring showcase views
      */
     public static class Builder {
-        private static final int CIRCLE_SHAPE = 0;
+        private static final int CIRCLE_SHAPE = 2;
         private static final int RECTANGLE_SHAPE = 1;
-        private static final int NO_SHAPE = 2;
+        private static final int NO_SHAPE = 0;
+        private static final int OVAL_SHAPE = 3;
 
         private boolean fullWidth = false;
         private int shapeType = CIRCLE_SHAPE;
@@ -604,6 +648,16 @@ public class MaterialShowcaseView
          */
         public Builder setTarget(View target) {
             showcaseView.setTarget(new ViewTarget(target));
+            return this;
+        }
+
+        public Builder setTarget(int targetId) {
+            showcaseView.setTarget(new ViewTarget(targetId, activity));
+            return this;
+        }
+
+        public Builder setConfig(ShowcaseConfig config) {
+            showcaseView.setConfig(config);
             return this;
         }
 
@@ -637,6 +691,16 @@ public class MaterialShowcaseView
 
         public Builder setDismissText(CharSequence dismissText) {
             showcaseView.setDismissText(dismissText);
+            return this;
+        }
+
+        public Builder setDismissTextSize(int sp) {
+            showcaseView.setDismissTextSizeSp(sp);
+            return this;
+        }
+
+        public Builder setDismissButtonColor(int color) {
+            showcaseView.setDismissButtonColor(color);
             return this;
         }
 
@@ -876,6 +940,13 @@ public class MaterialShowcaseView
             return this;
         }
 
+        public Builder withoutShape(int topMarginDp, int bottomMarginDp) {
+            shapeType = NO_SHAPE;
+            showcaseView.setTopMargin(topMarginDp);
+            showcaseView.setBotMargin(bottomMarginDp);
+            return this;
+        }
+
         public Builder setShapePadding(int padding) {
             showcaseView.setShapePadding(padding);
             return this;
@@ -891,6 +962,11 @@ public class MaterialShowcaseView
             return this;
         }
 
+        public Builder withOvalShape() {
+            this.shapeType = OVAL_SHAPE;
+            return this;
+        }
+
         public Builder renderOverNavigationBar() {
             // Note: This only has an effect in Lollipop or above.
             showcaseView.setRenderOverNavigationBar(true);
@@ -900,18 +976,18 @@ public class MaterialShowcaseView
         public MaterialShowcaseView build() {
             if (showcaseView.mShape == null) {
                 switch (shapeType) {
-                    case RECTANGLE_SHAPE: {
+                    case RECTANGLE_SHAPE:
                         showcaseView.setShape(new RectangleShape(showcaseView.mTarget.getBounds(), fullWidth));
                         break;
-                    }
-                    case CIRCLE_SHAPE: {
+                    case CIRCLE_SHAPE:
                         showcaseView.setShape(new CircleShape(showcaseView.mTarget));
                         break;
-                    }
-                    case NO_SHAPE: {
+                    case NO_SHAPE:
                         showcaseView.setShape(new NoShape());
                         break;
-                    }
+                    case OVAL_SHAPE:
+                        showcaseView.setShape(new OvalShape(showcaseView.mTarget));
+                        break;
                     default:
                         throw new IllegalArgumentException("Unsupported shape type: " + shapeType);
                 }
@@ -962,7 +1038,6 @@ public class MaterialShowcaseView
      * @return
      */
     public boolean show(final Activity activity) {
-
         /**
          * if we're in single use mode and have already shot our bolt then do nothing
          */
@@ -982,12 +1057,16 @@ public class MaterialShowcaseView
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                if (mShouldAnimate) {
-                    fadeIn();
-                } else {
-                    setVisibility(VISIBLE);
-                    notifyOnDisplayed();
+                try {
+                    if (mShouldAnimate) {
+                        fadeIn();
+                    } else {
+                        setVisibility(VISIBLE);
+                        notifyOnDisplayed();
+                    }
+                } catch (RuntimeException e) {
+                    Log.e(TAG, "Something's gone wrong while displaying showcase view");
+                    e.printStackTrace();
                 }
             }
         }, mDelayInMillis);

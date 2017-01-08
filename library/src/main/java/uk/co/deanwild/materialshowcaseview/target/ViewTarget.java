@@ -3,6 +3,7 @@ package uk.co.deanwild.materialshowcaseview.target;
 import android.app.Activity;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.media.NotProvisionedException;
 import android.view.View;
 
 
@@ -12,11 +13,12 @@ public class ViewTarget
     private final View mView;
 
     public ViewTarget(View view) {
+        if(view == null) throw new NullPointerException("Target view is null!");
         mView = view;
     }
 
     public ViewTarget(int viewId, Activity activity) {
-        mView = activity.findViewById(viewId);
+        this(activity.findViewById(viewId));
     }
 
     @Override
