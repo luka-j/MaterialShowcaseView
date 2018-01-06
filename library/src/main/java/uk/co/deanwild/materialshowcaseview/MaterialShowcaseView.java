@@ -1127,20 +1127,32 @@ public class MaterialShowcaseView
     public void animateIn() {
         setVisibility(INVISIBLE);
 
-        mAnimationFactory.animateInView(this, mTarget.getPoint(), mFadeDurationInMillis,
-                                     new IAnimationFactory.AnimationStartListener() {
-                    @Override
-                    public void onAnimationStart() {
-                        setVisibility(View.VISIBLE);
-                        notifyOnDisplayed();
-                    }
-                }
-                                    );
+        Point animPoint;
+        if(mTarget != null) animPoint = mTarget.getPoint();
+        else {
+            int width= this.getResources().getDisplayMetrics().widthPixels;
+            int height= this.getResources().getDisplayMetrics().heightPixels;
+            animPoint = new Point(width/2, height/2);
+        }
+        mAnimationFactory.animateInView(this, animPoint, mFadeDurationInMillis,
+                                        new IAnimationFactory.AnimationStartListener() {
+                                            @Override
+                                            public void onAnimationStart() {
+                                                setVisibility(View.VISIBLE);
+                                                notifyOnDisplayed();
+                                            }
+                                        });
     }
 
     public void animateOut() {
-
-        mAnimationFactory.animateOutView(this, mTarget.getPoint(), mFadeDurationInMillis, new IAnimationFactory.AnimationEndListener() {
+        Point animPoint;
+        if(mTarget != null) animPoint = mTarget.getPoint();
+        else {
+            int width= this.getResources().getDisplayMetrics().widthPixels;
+            int height= this.getResources().getDisplayMetrics().heightPixels;
+            animPoint = new Point(width/2, height/2);
+        }
+        mAnimationFactory.animateOutView(this, animPoint, mFadeDurationInMillis, new IAnimationFactory.AnimationEndListener() {
             @Override
             public void onAnimationEnd() {
                 setVisibility(INVISIBLE);
