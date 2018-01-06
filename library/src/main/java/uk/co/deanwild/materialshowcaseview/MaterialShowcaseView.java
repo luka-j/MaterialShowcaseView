@@ -25,7 +25,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -77,9 +76,10 @@ public class MaterialShowcaseView
     private boolean mDismissOnTouch = false;
     private boolean mShouldRender = false; // flag to decide when we should actually render
     private boolean mRenderOverNav = false;
-    private int mMaskColour;
-    private AnimationFactory mAnimationFactory;
+    private int                  mMaskColour;
+    private IAnimationFactory mAnimationFactory;
     private boolean mShouldAnimate = true;
+    private boolean mUseFadeAnimation = false;
     private long mFadeDurationInMillis = ShowcaseConfig.DEFAULT_FADE_TIME;
     private Handler mHandler;
     private long mDelayInMillis = ShowcaseConfig.DEFAULT_DELAY;
@@ -116,9 +116,6 @@ public class MaterialShowcaseView
 
     private void init(Context context) {
         setWillNotDraw(false);
-
-        // create our animation factory
-        mAnimationFactory = new AnimationFactory();
 
         mListeners = new ArrayList<>();
 
@@ -425,6 +422,10 @@ public class MaterialShowcaseView
         }
     }
 
+    private void setUseFadeAnimation(boolean useFadeAnimation) {
+        mUseFadeAnimation = useFadeAnimation;
+    }
+
     private void setTitleTextColor(int textColour) {
         if (mTitleTextView != null) {
             mTitleTextView.setTextColor(textColour);
@@ -448,6 +449,11 @@ public class MaterialShowcaseView
             mDismissButton.setVisibility(VISIBLE);
         }
     }
+
+    public void setAnimationFactory(IAnimationFactory animationFactory) {
+        this.mAnimationFactory = animationFactory;
+    }
+
 
     private void setDismissTextColor(int textColour) {
         if (mDismissStyle == ShowcaseConfig.DISMISS_STYLE_TEXT) {
@@ -663,6 +669,11 @@ public class MaterialShowcaseView
 
         public Builder setIsSequence(Boolean isSequence) {
             showcaseView.setIsSequence(isSequence);
+            return this;
+        }
+
+        public Builder useFadeAnimation() {
+            showcaseView.setUseFadeAnimation(true);
             return this;
         }
 
@@ -993,6 +1004,15 @@ public class MaterialShowcaseView
                 }
             }
 
+            if (showcaseView.mAnimationFactory == null) {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !showcaseView.mUseFadeAnimation) {
+                    showcaseView.setAnimationFactory(new CircularRevealAnimationFactory());
+                }
+                else {
+                    showcaseView.setAnimationFactory(new FadeAnimationFactory());
+                }
+            }
+
             return showcaseView;
         }
 
@@ -1059,7 +1079,7 @@ public class MaterialShowcaseView
             public void run() {
                 try {
                     if (mShouldAnimate) {
-                        fadeIn();
+                        animateIn();
                     } else {
                         setVisibility(VISIBLE);
                         notifyOnDisplayed();
@@ -1085,7 +1105,7 @@ public class MaterialShowcaseView
         mWasDismissed = true;
 
         if (mShouldAnimate) {
-            fadeOut();
+            animateOut();
         } else {
             removeFromWindow();
         }
@@ -1098,29 +1118,29 @@ public class MaterialShowcaseView
         mWasSkipped = true;
 
         if (mShouldAnimate) {
-            fadeOut();
+            animateOut();
         } else {
             removeFromWindow();
         }
     }
 
-    public void fadeIn() {
+    public void animateIn() {
         setVisibility(INVISIBLE);
 
-        mAnimationFactory.fadeInView(this, mFadeDurationInMillis,
-                new IAnimationFactory.AnimationStartListener() {
+        mAnimationFactory.animateInView(this, mTarget.getPoint(), mFadeDurationInMillis,
+                                     new IAnimationFactory.AnimationStartListener() {
                     @Override
                     public void onAnimationStart() {
                         setVisibility(View.VISIBLE);
                         notifyOnDisplayed();
                     }
                 }
-        );
+                                    );
     }
 
-    public void fadeOut() {
+    public void animateOut() {
 
-        mAnimationFactory.fadeOutView(this, mFadeDurationInMillis, new IAnimationFactory.AnimationEndListener() {
+        mAnimationFactory.animateOutView(this, mTarget.getPoint(), mFadeDurationInMillis, new IAnimationFactory.AnimationEndListener() {
             @Override
             public void onAnimationEnd() {
                 setVisibility(INVISIBLE);
