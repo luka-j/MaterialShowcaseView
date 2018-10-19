@@ -1,4 +1,7 @@
 # MaterialShowcaseView
+
+__Note: this is a fork of a fork of a ... so this readme might not reflect the actual&current info, and I don't have time to thoroughly update it. Read with a grain of salt.__
+
 A Material Design themed ShowcaseView for Android
 
 This library is heavily inspired by the original [ShowcaseView library][1].
@@ -8,6 +11,9 @@ Since Google introduced the Material design philosophy I have seen quite a few a
 About this fork: the original implementation didn't have a skip button. As some users may find frustrating to be stuck in a tutorial sequence I've created a new button that enabled user to skip the remaining items.
 
 I've also added the option to use a Button instead of a TextView to skip (default is still TextView). 
+
+
+About _this_ fork: The original didn't have the option to show oval around target, which is now implemented.
 
 ![Logo](http://i.imgur.com/QIMYRJh.png)
 
@@ -34,12 +40,12 @@ Then add the dependency to your module's build.gradle:
 
 /app/build.gradle
 ```groovy
-compile 'com.github.fibelatti:MaterialShowcaseView:2.1.0'
+compile 'com.github.luq-0:MaterialShowcaseView:1.2.0'
 ```
 
 NOTE: Some people have mentioned that they needed to add the @aar suffix to get it to resolve from JitPack:
 ```groovy
-compile 'com.github.fibelatti:MaterialShowcaseView:2.1.0@aar'
+compile 'com.github.fibelatti:MaterialShowcaseView:1.2.0@aar'
 ```
 
 # How to use
